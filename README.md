@@ -17,7 +17,7 @@ line 6- admin user's email address
 line 7- admin user's username
 line 8- admin user's password
 
-After these have been changed, upload all files (including the .htaccess file) to the root of your server, and then you can log in and edit content on the site through the admin interface provided by clicking on the "Admin" link on the bottom of the page. 
+After these have been changed, upload all files (including the .htaccess file) to the root of your server (Apache with PHP), and then you can log in and edit content on the site through the admin interface provided by clicking on the "Admin" link on the bottom of the page. 
 
 This application is based on NMCMS (http://www.nm.bob.wadholm.com/), No More Content Management System.
 
