@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 //error_reporting(0);
 $siteRoot = "/";
@@ -15,14 +15,14 @@ $editValue = $_REQUEST['value'];
 $deletePage = $_REQUEST['deletePage'];
 $resultNum = '';
 if($_SESSION['userFullName']){
-	$userFullName = $_SESSION['userFullName'];	
+	$userFullName = $_SESSION['userFullName'];
 } elseif ($_REQUEST["nameLogin"]){
 	$userFullName = preg_replace('/[^a-z\s]/i','',$_REQUEST["nameLogin"]);
 	$_SESSION['userFullName'] = $userFullName;
-}	
+}
 if(isset($_SESSION['contactID'])){
 	$contactID = $_SESSION['contactID'];
-} else {	
+} else {
 	$contactID = get_random_string();
 	$_SESSION['contactID'] = $contactID;
 }
@@ -40,21 +40,21 @@ if(!$_SESSION['admin'] || $_SESSION['admin'] == false){
 	$username = $_REQUEST["vip"];
 	$password = $_REQUEST["vipp"];
 	$userLogin = $_REQUEST["Login"];
-	
+
 	$userRegister = urlencode(preg_replace('/\@/', '-_-' , $_REQUEST['use']));
 	$user = preg_replace('/\@/', '-_-', $username);
 	$user2 = preg_replace('/\@/', '-_-', $userLogin);
-	
+
 	if($page == 'logout'){ // Logout
 		session_destroy();
 		$page = 'index';
 		header('Location: ' . $siteRoot);
 	} else if ($_SESSION['userID']){ // Currently logged in user
-		$userLogin = $_SESSION['userID'];				
+		$userLogin = $_SESSION['userID'];
 		$_SESSION['user'] = true;
 		$user = $userLogin;
 	} else if ($username == $adminUsername && $password == $adminPassword){ // Admin user
-		$_SESSION['admin'] = true;		
+		$_SESSION['admin'] = true;
 		$_SESSION['user'] = true;
 		$admin = true;
 		$user = $username;
@@ -70,7 +70,7 @@ if(!$_SESSION['admin'] || $_SESSION['admin'] == false){
 			$page = $currentPage."___".$currentSection;
 			header('Location: /' . $currentPage.'/'.$currentSection);
 		}
-		$admin = false;		
+		$admin = false;
 	} else if (filter_var($_REQUEST['use'], FILTER_VALIDATE_EMAIL)){ // Registering user 1
 		$_SESSION['register'] = $userRegister;
 		$_SESSION['userID'] = $user2;
@@ -78,8 +78,8 @@ if(!$_SESSION['admin'] || $_SESSION['admin'] == false){
 		$admin = false;
 		$user = $userRegister;
 		$userLogin = $userRegister;
-		
-	} else if ($_SESSION['user'] == true){ // If currently a user	
+
+	} else if ($_SESSION['user'] == true){ // If currently a user
 		if ($page == 'logout'){ // allow logging out
 			session_destroy();
 			$page = 'index';
@@ -91,10 +91,10 @@ if(!$_SESSION['admin'] || $_SESSION['admin'] == false){
 	} else if ($_SESSION['register'] != false){ // If the user has a session of register
 		$user = $_SESSION['register'];
 		$_SESSION['userID'] = $userRegister;
-		
+
 	} else {
 		$admin = false;
-		$user = false;		
+		$user = false;
 	};
 } else if ($_SESSION['admin'] == true){	// If currently logged in as admin
 	if ($page == 'logout'){
@@ -113,7 +113,7 @@ if($_REQUEST['use'] && $_REQUEST['registerID'] == $contactID){
 	$registerName = urlencode(preg_replace('/\@/', '-_-' , $_REQUEST['use']));
 	$registerBot = $_REQUEST['registerPassword'];
 	$registerFullName = urlencode ($_REQUEST["fullName"]);
-	
+
 	if($registerBot != ''){
 		$registerError .=  '<p>You are a spambot. Go away!</p>';
 	} else {
@@ -123,50 +123,50 @@ if($_REQUEST['use'] && $_REQUEST['registerID'] == $contactID){
 	        } else {
     			$to = $registerEmail;
     			$subject = "Encounters Registration Confirmation";
-    			$body = 'You have registered for training on the Encounters Website. 
+    			$body = 'You have registered for training on the Encounters Website.
 Go to the URL below to confirm your registration and begin training:
 
 '.$siteURL .'/?reg='.$registerName.'&regID='.$contactID.'&regName='. $registerFullName .'
 
-Login to the site each time with your name and the following email (no password required): 
+Login to the site each time with your name and the following email (no password required):
 
 '. $registerEmail;
     		    $headers   = array();
     			$headers[] = 'From: '. $adminEmail;
-    		
+
     			if (mail($to, $subject, $body, implode("\r\n", $headers))) {
     				$registerSuccess .=  ("<p><strong>Check your email for the registration confirmation. Remember to click on the link in the email to complete your registration.</strong></p>");
     			} else {
-    				$registerError .= '<p>We were unable to send your registration via this website. Please try contacting the web site administrator directly at '.$adminEmail.'. Sorry for any inconvenience.</p>';	
+    				$registerError .= '<p>We were unable to send your registration via this website. Please try contacting the web site administrator directly at '.$adminEmail.'. Sorry for any inconvenience.</p>';
     			}
 	        }
 		} else {
 			$registerError .= '<p>Please provide a valid email address</p>';
-		}		
+		}
 	}
 }
 // After registration email is sent and confirmed/validated, create user account
 if($_REQUEST['reg'] == $_SESSION['register'] && $_REQUEST['regID'] == $contactID){
-	$usersEmail = preg_replace('/-_-/', '@' ,$_REQUEST['reg']); 
+	$usersEmail = preg_replace('/-_-/', '@' ,$_REQUEST['reg']);
 	$usersName = urlencode($_REQUEST['reg']);
 	$userFullName = $_REQUEST['regName'];
 	if(filter_var($usersEmail, FILTER_VALIDATE_EMAIL)){
 	    // Make sure name has only safe characters
-	    if(!preg_match("/^[a-zA-Z'-]+$/", $userFullName)){    		
-	        setUser($usersName, 'RegisterNow', $usersEmail, $userFullName);    		
-    		$_SESSION['user'] = true; 
+	    if(!preg_match("/^[a-zA-Z'-]+$/", $userFullName)){
+	        setUser($usersName, 'RegisterNow', $usersEmail, $userFullName);
+    		$_SESSION['user'] = true;
     		$_SESSION['userID'] = $usersEmail;
 			$_SESSION['userFullName'] = $userFullName;
     		$user = $usersEmail;
     		header('Location: /');
-	    } else {	        
+	    } else {
 	    	$registerError .= '<p>We are sorry, there was an error setting up your account. Your name appears to have invalid characters in it. Try again, or contact us directly at <a href="mailto:'.$adminEmail.'">'.$adminEmail.'</a>.</p>';
 	    }
 	} else {
 	    $registerError .= '<p>We are sorry, there was an error setting up your account. It appears that the email address you gave is not valid. Try again, or contact the administrator directly at <a href="mailto:'.$adminEmail.'">'.$adminEmail.'</a>.</p>';
 	}
 }else if($_REQUEST['reg']) {
-	 $registerError .= '<p>We are sorry, there was an error setting up your account. Try again, or contact us directly at <a href="mailto:'.$adminEmail.'">'.$adminEmail.'</a>.</p>';	
+	 $registerError .= '<p>We are sorry, there was an error setting up your account. Try again, or contact us directly at <a href="mailto:'.$adminEmail.'">'.$adminEmail.'</a>.</p>';
 }
 
 // Contact Page
@@ -175,10 +175,10 @@ if($page == 'contact' && $_REQUEST['contact'] == $contactID){
 	$contactEmail = $_REQUEST['email'];
 	$contactBot = $_REQUEST['phone'];
 	$contactMessage = strip_tags($_REQUEST['message']);
-	
+
 	if($contactBot != ''){
 		$contactError .=  '<p>You are a spambot. Go away!</p>';
-	} else {	
+	} else {
 		if(preg_match("/^[A-Z][a-zA-Z\s(\')\. -]+$/", $contactName) !== 0){
 			$contactError .=  '<p>Please provide your full name. (Only letters and spaces)</p>';
 		} else {
@@ -189,11 +189,11 @@ if($page == 'contact' && $_REQUEST['contact'] == $contactID){
 				if (mail($to, $subject, $body)) {
 					$contactSuccess .=  ("<p><strong>The following message was sent successfully. We will try to get back to you soon. Thanks!</strong><br /><br />". $contactMessage ."</p>");
 				} else {
-					$contactError .= 'We were unable to send your message via this website. Please try contacting the website administrator directly via the email below. Sorry for any inconvenience.';	
+					$contactError .= 'We were unable to send your message via this website. Please try contacting the website administrator directly via the email below. Sorry for any inconvenience.';
 				}
 			} else {
 				$contactError .= '<p>Please provide a valid email address</p>';
-			}		
+			}
 		}
 	}
 }
@@ -201,17 +201,17 @@ if($page == 'contact' && $_REQUEST['contact'] == $contactID){
 
 // Set index as default page
 if(!$page || $page === false || $page == ''){
-	$page = 'index';	
+	$page = 'index';
 }
 
 function getContent($elementID, $pageID){
 	$filename = $siteRoot .'pages/'. urlencode($pageID) .'.json';
 	if (file_exists($filename)) {
 		$result = json_decode(file_get_contents($filename));
-		$mainContent = $result->$elementID;	
+		$mainContent = $result->$elementID;
 		return $mainContent;
 	} else {
-		return;	
+		return;
 	};
 };
 
@@ -220,19 +220,19 @@ function setContent($elementID, $elementValue, $pageID){
 	$content = json_decode(@file_get_contents($filename), true);
 	$elementValue = str_replace('\"','"',$elementValue);
 	$elementValue = str_replace("\'","'",$elementValue);
-	
-	if($elementID == 'nav_menu'){		
-		$content[$elementID] = $elementValue; 
+
+	if($elementID == 'nav_menu'){
+		$content[$elementID] = $elementValue;
 	}else{
 		$elementValue = str_replace(array("\r", "\n", "  "), ' ', $elementValue);
 		$content[$elementID] = trim($elementValue);
 	}
-		
+
 	@file_put_contents($filename, json_encode($content));
-	
+
 	if($pageID != 'all_pics'){
-		echo getContent($elementID, $pageID);	
-	};	
+		echo getContent($elementID, $pageID);
+	};
 }
 
 function setUser($elementID, $elementValue, $pageID, $userFullName){	//$usersName,'RegisterNow',$user4, $userFullName
@@ -247,7 +247,7 @@ function setUser($elementID, $elementValue, $pageID, $userFullName){	//$usersNam
 			$content[$userFullName]['currentAssessment'] = false;
 			$content[$userFullName]['assessment1'] = false;
 			$content[$userFullName]['assessment2'] = false;
-			$content[$userFullName]['assessment3'] = false; 
+			$content[$userFullName]['assessment3'] = false;
 			$content[$userFullName]['assessment4'] = false;
 			$content[$userFullName]['mail'] = $pageID;
 			$content[$userFullName]['fullname'] = $userFullName;
@@ -260,13 +260,13 @@ function setUser($elementID, $elementValue, $pageID, $userFullName){	//$usersNam
 			$content[$userFullName]['currentAssessment'] = false;
 			$content[$userFullName]['assessment1'] = false;
 			$content[$userFullName]['assessment2'] = false;
-			$content[$userFullName]['assessment3'] = false; 
+			$content[$userFullName]['assessment3'] = false;
 			$content[$userFullName]['assessment4'] = false;
 			$content[$userFullName]['mail'] = $pageID;
 			$content[$userFullName]['fullname'] = $userFullName;
 			$_SESSION['userID'] = $pageID;
 	};
-	@file_put_contents($filename, json_encode($content));		
+	@file_put_contents($filename, json_encode($content));
 }
 
 function getInfo($elementID, $pageID){
@@ -277,24 +277,24 @@ function getInfo($elementID, $pageID){
 		if($result[$userFullName]){
 			return $result[$userFullName][$elementID];
 		} else {
-			return;	
+			return;
 		}
 	} else {
-		return;	
+		return;
 	}
 }
 
 function getUser($userID){
 	$filename = '../encountersReg/'. urlencode($userID) .'.json';
 	if (file_exists($filename)) {
-		$result = json_decode(file_get_contents($filename));		
+		$result = json_decode(file_get_contents($filename));
 		if($result[$userFullName]){
 			return $result[$userFullName];
 		} else {
-			return;	
+			return;
 		}
 	} else {
-		return;	
+		return;
 	};
 };
 
@@ -309,14 +309,14 @@ function trackPage($page, $passedQuiz){
 				setUser('assessment'. $pageArray[0], $passedQuiz, $userLogin, $userFullName);
 				setUser('currentAssessment', false, $userLogin, $userFullName);
 			} else if ($pageArray[1]){
-				setUser('currentSection', $pageArray[1], $userLogin, $userFullName);		
+				setUser('currentSection', $pageArray[1], $userLogin, $userFullName);
 				setUser('currentPage', $pageArray[0], $userLogin, $userFullName);
 			} else {
 				setUser('currentSection', $pageArray[1], $userLogin, $userFullName);
-				setUser('currentPage', '', $userLogin, $userFullName);	
+				setUser('currentPage', '', $userLogin, $userFullName);
 			}
 		}
-	}	
+	}
 }
 
 function survey($survey){
@@ -330,7 +330,7 @@ function survey($survey){
 		$survey[9] = strip_tags($survey[9]);
 		$survey[10] = strip_tags($survey[10]);
 		$survey[11] = date("F j, Y, g:i a");
-		
+
 		$filename = fopen("../encountersReg/survey.csv", "a");
 		fputcsv($filename, $survey);
 		fclose($filename);
@@ -340,17 +340,17 @@ function survey($survey){
 function archiveContent($pageID){
 	$filename = $siteRoot .'pages/'. urlencode($pageID) .'.json';
 	$archived = $siteRoot .'archive/'. urlencode($pageID) .'.json';
-	
+
 	$content = json_decode(@file_get_contents($filename), true);
 	@file_put_contents($archived, json_encode($content));
-	@unlink($filename);	
+	@unlink($filename);
 }
 
 function exit_status($str){
 	echo json_encode(array('status'=>$str));
 	exit;
 }
-	
+
 function get_extension($file_name){
 	$ext = explode('.', $file_name);
 	$ext = array_pop($ext);
@@ -365,22 +365,22 @@ function get_random_string($length = 10) {
     }
     return $randomString;
 }
-	
-function uploadContent(){	
+
+function uploadContent(){
 	$upload_dir = $siteRoot .'uploads/';
 	$allowed_ext = array('jpg','jpeg','JPG','JPEG','png','PNG','gif','GIF');
 	$all_thumbs = json_decode(@file_get_contents($siteRoot .'pages/all_pics.json'), true);
-	
+
 	if(strtolower($_SERVER['REQUEST_METHOD']) != 'post'){
 		exit_status('Error! Wrong HTTP method!');
 	}
-	
+
 	if(array_key_exists('pic',$_FILES) && $_FILES['pic']['error'] == 0 ){
-	
+
 		$pic = $_FILES['pic'];
 		$picNameFix = array("+", "(", ")", "|", "'", "?", " ");
 		$picName = str_replace($picNameFix, '',$pic['name']);
-		
+
 		if(!in_array(get_extension($picName),$allowed_ext)){
 			exit_status('Only '.implode(',',$allowed_ext).' files are allowed!');
 		}
@@ -394,11 +394,11 @@ function uploadContent(){
 				}
 			}
 		}
-		// Move the uploaded file from the temporary directory to the uploads folder, 
+		// Move the uploaded file from the temporary directory to the uploads folder,
 		// create a thumbnail, and log all pics in json file:
 		if(move_uploaded_file($pic['tmp_name'], $upload_dir.$picName)){
 			setContent($picName, $upload_dir.$picName, 'all_pics');
-			
+
 			$type=false;
 			function open_image ($file) {
 				//detect type and process accordinally
@@ -414,17 +414,17 @@ function uploadContent(){
 				  case "image/png":
 					  $im = imagecreatefrompng($file); //png file
 				  break;
-				default: 
+				default:
 					$im=false;
 				break;
 				}
 				return $im;
 			}
 			$thumbnailImage = open_image($upload_dir.$picName);
-			
+
 			$w = imagesx($thumbnailImage);
 			$h = imagesy($thumbnailImage);
-			
+
 			//calculate new image dimensions (preserve aspect)
 			if(isset($_GET['w']) && !isset($_GET['h'])){
 				$new_w=$_GET['w'];
@@ -438,19 +438,19 @@ function uploadContent(){
 				if(($w/$h) > ($new_w/$new_h)){
 					$new_h=$new_w*($h/$w);
 				} else {
-					$new_w=$new_h*($w/$h);    
+					$new_w=$new_h*($w/$h);
 				}
-			} 
-			
+			}
+
 			$im2 = ImageCreateTrueColor($new_w, $new_h);
-			
+
 			$imageFormat = strtolower(substr(strrchr($picName,"."),1));
 			if($imageFormat == "gif" || $imageFormat == "png"){
 				imagecolortransparent($im2, imagecolorallocatealpha($im2, 0, 0, 0, 127));
 				imagealphablending($im2, false);
 				imagesavealpha($im2, true);
 			}
-			
+
 			imagecopyResampled ($im2, $thumbnailImage, 0, 0, 0, 0, $new_w, $new_h, $w, $h);
 			//effects
 			if(isset($_GET['blur'])){
@@ -459,8 +459,8 @@ function uploadContent(){
 					$matrix=array(array(1,1,1),array(1,1,1),array(1,1,1));
 					$divisor = 9;
 					$offset = 0;
-					imageconvolution($im2, $matrix, $divisor, $offset); 
-				} 
+					imageconvolution($im2, $matrix, $divisor, $offset);
+				}
 			}
 			if(isset($_GET['sharpen'])){
 				$lv=$_GET['sharpen'];
@@ -469,43 +469,43 @@ function uploadContent(){
 					$divisor = 8;
 					$offset = 0;
 					imageconvolution($im2, $matrix, $divisor, $offset);
-				} 
+				}
 			}
 			imagejpeg($im2, $upload_dir.'thumbs/'.$picName);
 			imagegif($im2, $upload_dir.'thumbs/'.$picName);
 			imagepng($im2, $upload_dir.'thumbs/'.$picName);
 			//move_uploaded_file($thumbnailImage, $upload_dir.'thumbs/'.$picName);
-			
+
 			//copy($upload_dir.$picName, $upload_dir.'thumbs/'.$picName);
 			exit_status('File was uploaded successfuly!');
-		}	
-	}	
-	exit_status('Something went wrong with your upload!');	
+		}
+	}
+	exit_status('Something went wrong with your upload!');
 }
 
 function getThumbnails(){
-	$dirpath = $siteRoot ."uploads/thumbs/"; 
-	$dh = opendir($dirpath); 
+	$dirpath = $siteRoot ."uploads/thumbs/";
+	$dh = opendir($dirpath);
 	echo '<div id="all_pics_holder">';
-	while (false !== ($file = readdir($dh))) { 
-		if (!is_dir("$dirpath/$file")) { 
-	
-		   echo '<div class="all_pics"><a class="insertPic" rel="'. $file .'" title="Insert image into page"><img src="'. $dirpath . $file .'" /></a>'. $file .'<br /><a class="insertPicBtn insertPic" rel="'. $file .'" title="Insert image into page">Insert</a></div>'; 
+	while (false !== ($file = readdir($dh))) {
+		if (!is_dir("$dirpath/$file")) {
+
+		   echo '<div class="all_pics"><a class="insertPic" rel="'. $file .'" title="Insert image into page"><img src="'. $dirpath . $file .'" /></a>'. $file .'<br /><a class="insertPicBtn insertPic" rel="'. $file .'" title="Insert image into page">Insert</a></div>';
 		}
-	} 
+	}
 	echo '</div>';
 	closedir($dh);
 }
 
 
 if($deletePage == 'yes' && $page != 'index'){
-	if($admin == true){	
+	if($admin == true){
 		archiveContent($page);
-	};	
+	};
 }
 
 if($editID){
-	if($admin == true && $page != "all_pics"){	
+	if($admin == true && $page != "all_pics"){
 		setContent($editID, $editValue, $page);
 	};
 } elseif ($page == "upload"){
@@ -529,7 +529,7 @@ if($editID){
 <title><?php
 	$pageTitle =  getContent('page_title', $page, $noPageError);
 	if($pageTitle != ""){
-		echo $pageTitle .' - '; 
+		echo $pageTitle .' - ';
 	}
  	echo getContent('site_title', 'index');
 ?></title>
@@ -557,13 +557,13 @@ if($editID){
         <a href="#skip">Skip to main content</a>
         <hr />
     </div>
-    
-    <?php 
+
+    <?php
 	if($admin == true){
 		// Admin bar at top
 		echo '<div id="adminBar"><p><a href="#editTitle" id="editTitleBtn">Edit Page Title</a> ';
 		if($page != 'index') {
-			echo '<a href="#deleter" id="deleterBtn">Delete Page</a> '; 
+			echo '<a href="#deleter" id="deleterBtn">Delete Page</a> ';
 		}
 		echo '<a href="#editMenu" id="editMenuBtn">Edit Menu</a> <a href="http://nm.bob.wadholm.com/help" class="menuItem">Help</a> <a style="float: right;" href="'. $siteRoot .'logout">Logout</a></p></div>';
 		// Edit Page Title
@@ -572,81 +572,81 @@ if($editID){
 		echo '<div id="deleter" class="menuItem"><h2>Are you sure you want to delete this page?</h2><form method="POST"><p><input type="checkbox" value="yes" name="deletePage" id="deletePage" /> <label for="deletePage"><strong>Yes, delete it!</strong></label><br /><button type="submit">Delete</button><button type="reset" id="cancelDelete">Cancel</button></p></form></div>';
 		// Edit Nav Menu
 		echo '<div id="editMenu" class="menuItem"><h2>Top Navigation Menu:</h2><div class="edit_menu" id="nav_menu">'. getContent('nav_menu', 'nav_menu') .'</div></div>';
-		// Upload image or file	
+		// Upload image or file
 ?>
     <div class="menuItem">
         <div id="upload">
             <h2>Upload Image or File</h2>
             <div id="dropbox">
-                <span class="message">Drop images here to upload. <br /><i>(Use Chrome or Firefox Browser)</i></span>	
+                <span class="message">Drop images here to upload. <br /><i>(Use Chrome or Firefox Browser)</i></span>
             </div>
             <h2>All uploaded files</h2>
             <p><input type="text" id="searcher" placeholder="Search" /></p>
-            
+
             <div id="all_pics">
-            </div><!-- /all_pics -->            
+            </div><!-- /all_pics -->
         </div><!-- /upload -->
     </div><!-- /menuitem -->
-<?php } 
+<?php }
 // End of Admin bar
-?> 
+?>
 	<div id="outsideWrapper">
-        <header>  
+        <header>
             <div id="logo">
                 <a href="<?php echo $siteRoot ?>"><?php echo getContent('site_title', 'index'); ?></a>
-            </div>            
-            
+            </div>
+
             <nav id="topNav">
                 <?php
-				
+
 				$navValue = getContent('nav_menu', 'nav_menu');
 				$navValue = preg_replace('/(href=\")(.*\")/i', '$1'. $siteRoot .'$2 rel="$2', $navValue);
-				$navValue = preg_replace('/(href=\")(.*http:)(.*\")/i', '$1http:$3', $navValue);  
+				$navValue = preg_replace('/(href=\")(.*http:)(.*\")/i', '$1http:$3', $navValue);
 				echo $navValue;
-				?>  
+				?>
             </nav>
         </header>
-        
-        <div id="wrapper">          
+
+        <div id="wrapper">
           <div id="insideWrapper">
-                    
+
              <?php if ($page == 'index' || $page == '' || $page == 'index.php'){	?>
-                
+
                  <div role="homePage" id="home_page_wrapper">
                  	<nav id="innerNav" class="gradient blueGradient">
-                 		
+
                         <?php if($_SESSION['user'] != true){?>
-                        	<form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" title="Full Name" placeholder="Full Name" required name="nameLogin"><input type="email" title="Email Address" placeholder="email@example.com" required name="Login" /></form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a> 
+                        	<form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" title="Full Name" placeholder="Full Name" required name="nameLogin"><input type="email" title="Email Address" placeholder="email@example.com" required name="Login" /></form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a>
 						<?php } else { ?>
-                        	<p><a href="<?php echo $siteRoot; ?>logout" class="userLogout">Logout</a></p> 
-						<?php } ?> 
+                        	<p><a href="<?php echo $siteRoot; ?>logout" class="userLogout">Logout</a></p>
+						<?php } ?>
                  	</nav>
-                    
+
                     <div id="contactErrors">
 						<?php echo $registerError . $registerSuccess ?>
                     </div>
-                    
+
                  	<div role="home_page" class="edit_area" id="home_page">
                  	 	<?php echo getContent('home_page', 'index'); ?>
                     </div>
                  </div><!-- /home_page_wrapper -->
-                 
-                
-                
+
+
+
 				<?php }else if($page == 'contact'){ ?>
-                
-                <div role="main" id="main_content">                
+
+                <div role="main" id="main_content">
                 	<nav id="innerNav" class="gradient blueGradient">
-                 		
+
                         <?php if($_SESSION['user'] != true){?>
-                        	<p><form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" placeholder="Full Name" title="Full Name" required name="nameLogin"><input type="email" placeholder="email@example.com" title="Email Address" required name="Login" /></form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a></p> 
+                        	<p><form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" placeholder="Full Name" title="Full Name" required name="nameLogin"><input type="email" placeholder="email@example.com" title="Email Address" required name="Login" /></form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a></p>
 						<?php } ?>
-                        
+
                         <?php if($_SESSION['user'] == true){?>
-                        	<p><a href="<?php echo $siteRoot; ?>logout">Logout</a></p> 
-						<?php } ?> 
+                        	<p><a href="<?php echo $siteRoot; ?>logout">Logout</a></p>
+						<?php } ?>
                  	</nav>
-                    
+
                 	<form method="POST" action="contact" id="contactForm">
                     	<div id="contactErrors">
                         	<?php echo $contactError; ?>
@@ -654,77 +654,77 @@ if($editID){
                         <?php
 						if ($contactSuccess != ''){
 							echo '<div id="contactSuccess">'. $contactSuccess .'</div>';
-						} else { 
+						} else {
 							?>
-                            
-							<div id="contact_content" class="edit_area">						
-							<?php echo getContent('contact_content', $page); ?>							
+
+							<div id="contact_content" class="edit_area">
+							<?php echo getContent('contact_content', $page); ?>
 							</div>
-											  
+
 							<div id="phoneContact">
-								<p><label for="phone">Please leave this field blank.</label><br />		
+								<p><label for="phone">Please leave this field blank.</label><br />
 								<input type="phone" value="" name="phone" />
 								<input type="hidden" value="<?php echo $contactID; ?>" name="contact" /></p></div>
-							<?php if($admin == false){ 
+							<?php if($admin == false){
 								echo '<p><button type="submit" value="Submit">Submit</button></p>';
 							}
 						}?>
                     </form>
                 </div>
-                
+
                 <?php } else if($page == "1___results" || $page == "2___results" || $page == "3___results" || $page == "4___results") {
-					
+
 					include 'results.php'; ?>
-                        
+
                         <div role="home_page" class="edit_area" id="home_page">
-                            <div id="results">               
+                            <div id="results">
                             <?php if($_SESSION['user'] == true){
 									trackpage($page, false);
-									
+
 								} else {
-									echo "<div id=\"contactErrors\"><p><strong>You are not logged in!</strong> Make sure to log in so that your score can be recorded.</p></div>";	
+									echo "<div id=\"contactErrors\"><p><strong>You are not logged in!</strong> Make sure to log in so that your score can be recorded.</p></div>";
 								}
-							
-							    echo "<h2>Your score was: ". $resultNum ."%</h2>"; 
-                                
+
+							    echo "<h2>Your score was: ". $resultNum ."%</h2>";
+
                                 if($resultNum == 80){ ?>
 									<div class="error" style="border-left: 10px solid #900; color: #900; padding: 10px; margin: 10px 0px; box-shadow: 0px 0px 3px #ccc;" id="corrected" rel-q="<?php echo ($corrected[0]);?>" rel-a="<?php echo ($corrected[1]);?>">Please view your incorrect answer above (Question #<?php echo ($corrected[0]);?>)</div>
 								<?php }
-								
+
 								if($resultNum <= 60){
                                     echo '<p>Please review the previous material in this section and take the quiz again.</p><p><a href="'. $prevSection .'" class="prev">Review Section</a></p>';
-									
+
 									if($_SESSION['user'] == true){
-										trackpage($page, false);									
-									}	
+										trackpage($page, false);
+									}
                                 } else if($page != "4___results") {
                                     echo '<progress max="3" value="3"></progress>
 <p class="progressor">
     <strong>Progress:&hellip;Completed Module!</strong>
 </p>';
-									
+
 									$userLogin = preg_replace('/\@/','-_-', $_SESSION['userID']);
                                     if (getInfo("assessment1", $userLogin) == true && getInfo("assessment2", $userLogin) == true && getInfo("assessment3", $userLogin) == true && getInfo("assessment4", $userLogin) == true){
 										echo '<p>Great job! You have completed the training! You may now print a certificate of completion.</p><p><a href="print" class="next">Print</a></p>';
-										
-									} else {									
+
+									} else {
 										echo '<p>Great job! You are ready to move on to the next section.</p><p><a href="'. $nextSection .'" class="next">Next</a></p>';
 									}
-									
+
 									if($_SESSION['user'] == true){
-										trackpage($page, true);									
-									}										
+										trackpage($page, true);
+									}
                                 } else {
 									if($_SESSION['user'] == true){
-										trackpage($page, true);									
-									}	
-									
+										trackpage($page, true);
+									}
+
 									$userLogin = preg_replace('/\@/','-_-', $_SESSION['userID']);
-									if (getInfo("assessment1", $userLogin) == true && getInfo("assessment2", $userLogin) == true && getInfo("assessment3", $userLogin) == true && getInfo("assessment4", $userLogin) == true){ 
+									if (getInfo("assessment1", $userLogin) == true && getInfo("assessment2", $userLogin) == true && getInfo("assessment3", $userLogin) == true && getInfo("assessment4", $userLogin) == true){
 										echo '<br /><p id="allDoneNow"><b>Great job! You have completed the training!</b> Before you print your certificate of completion, we would like to ask you several brief questions below about your experience.</p>
-										
+
 										<!--<p><a href="print" class="next">Print Results</a></p>-->
-										
+
 										<br />
 <form id="surveyForm" method="POST" action="print" onselectstart="return false;">
     <h1>How was your experience?</h1>
@@ -822,46 +822,46 @@ if($editID){
         <span>
             <input type="radio" name="survey7" value="5">Excellent</span>
     </p>
-    
+
     <p class="survey">
     	<label for="survey8">What should be changed or improved on this website?</label>
-    	<textarea name="survey8" rows="4" cols="50"></textarea> 
-    </p> 
-    <p class="survey"> 
-    	<label for="survey9">The state of my workplace</label> 
-    	<select name="survey9"> 
+    	<textarea name="survey8" rows="4" cols="50"></textarea>
+    </p>
+    <p class="survey">
+    	<label for="survey9">The state of my workplace</label>
+    	<select name="survey9">
     		<option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District Of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO" selected="selected">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
-		</select> 
-	</p> 
+		</select>
+	</p>
 	<p class="survey">
 		<label for="survey10">The city of my workplace</label>
-		<input type="text" name="survey10"> 
+		<input type="text" name="survey10">
 	</p>
 	<p><button type="submit">Submit Survey &amp; Print Certificate of Completion</button></p>
 </form>
-										
+
 										<!--<p><a href="print" class="next">Print</a></p><p><a href="print" class="next">Print</a></p>-->';
-									} 
+									}
 								}
                             ?>
                             </div>
                     	</div>
 				<?php }else { ?>
-                
-                
-                    
+
+
+
                  <div role="main" class="edit_area" id="main_content">
-                 
+
                  <?php if(!$admin || $admin != true){ ?>
-                 
+
                  <nav id="innerNav" class="gradient blueGradient">
                     <p>
                     <?php if($_SESSION['user'] != true){?>
-                        <form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" placeholder="Full Name" title="Full Name" required name="nameLogin"><<input type="email" placeholder="email@example.com" title="Email Address" required name="Login" />/form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a> 
+                        <form method="post"><button type="submit" href="#" id="userLogin">Login</button><input type="text" placeholder="Full Name" title="Full Name" required name="nameLogin"><<input type="email" placeholder="email@example.com" title="Email Address" required name="Login" />/form><a href="#registrationForm" class="inline cboxElement" id="register">Register for Training</a>
                     <?php } ?>
-                    
+
                     <?php if($_SESSION['user'] == true){?>
-                        
+
                         <?php $pageArray = explode("___", $page);
 							if($pageArray[0]== "1"){ ?>
 								<a href="/1/1" id="currentHead"><img src="/img/walkingSmall.png" alt="Walking to the counter" title="Walking to the counter" width="38" height="38" /> Walking to the Counter</a>
@@ -872,50 +872,50 @@ if($editID){
 							<?php } elseif ($pageArray[0]== "4"){ ?>
 								<a href="/4/1"  id="currentHead"><img src="/img/reportingSmall.png" alt="State Reporting" title="State Reporting" width="38" height="38" /> State Reporting</a>
 							<?php }?>
-                            
+
                         <span id="yourProgress">Your Progress
-                        <?php 
-							$userLogin = preg_replace('/\@/','-_-', $_SESSION['userID']);	
-							$completed = 0;							
+                        <?php
+							$userLogin = preg_replace('/\@/','-_-', $_SESSION['userID']);
+							$completed = 0;
 						?>
-                        	<span><a href="/1/1"><img src="/img/<?php 
-								if (getInfo("assessment1", $userLogin) === true){ 
+                        	<span><a href="/1/1"><img src="/img/<?php
+								if (getInfo("assessment1", $userLogin) === true){
 									echo 'check';
-									$completed++;	
-								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Walking to the Counter</a> 
-                            <a href="/2/1"><img src="/img/<?php 
-								if (getInfo("assessment2", $userLogin) === true){ 
+									$completed++;
+								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Walking to the Counter</a>
+                            <a href="/2/1"><img src="/img/<?php
+								if (getInfo("assessment2", $userLogin) === true){
 									echo 'check';
-									$completed++;	
-								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Information Exchange</a> 
-                            <a href="/3/1"><img src="/img/<?php 
-								if (getInfo("assessment3", $userLogin) === true){ 
+									$completed++;
+								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Information Exchange</a>
+                            <a href="/3/1"><img src="/img/<?php
+								if (getInfo("assessment3", $userLogin) === true){
 									echo 'check';
-									$completed++;	
-								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Testing</a> 
-                            <a href="/4/1"><img id="assessment4Img" src="/img/<?php 
-								if (getInfo("assessment4", $userLogin) === true){ 
+									$completed++;
+								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> Testing</a>
+                            <a href="/4/1"><img id="assessment4Img" src="/img/<?php
+								if (getInfo("assessment4", $userLogin) === true){
 									echo 'check';
-									$completed++;	
-								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> State Reporting</a> 
+									$completed++;
+								} else { echo 'noCheck'; }; ?>.png?4" alt="Check box" /> State Reporting</a>
 								<?php if ($completed === 4){?>
                                 	<br />
                                     <a href="/4/print" id="printButton">Print Results</a>
                                 <?php } ?>
                             </span>
-                        </span>                       
-                        
-                        <a href="<?php echo $siteRoot; ?>logout" class="pageLogout">Logout</a> 
-						<?php } ?> 
-                        <a href="/4/1/" class="sectionLink"><img src="/img/reportingSmall.png?1" alt="State Reporting" title="Module 4: State Reporting" width="38" height="38" /></a> 
+                        </span>
+
+                        <a href="<?php echo $siteRoot; ?>logout" class="pageLogout">Logout</a>
+						<?php } ?>
+                        <a href="/4/1/" class="sectionLink"><img src="/img/reportingSmall.png?1" alt="State Reporting" title="Module 4: State Reporting" width="38" height="38" /></a>
                         <a href="/3/1" class="sectionLink"><img src="/img/visionSmall.png" alt="Testing" title="Module 3: Testing" width="38" height="38" /></a>
-                         <a href="/2/1" class="sectionLink"><img src="/img/informationSmall.png?2" alt="Information Exchange" title="Module 2: Information Exchange" width="38" height="38" /></a> 
+                         <a href="/2/1" class="sectionLink"><img src="/img/informationSmall.png?2" alt="Information Exchange" title="Module 2: Information Exchange" width="38" height="38" /></a>
                         <a href="/1/1" class="sectionLink"><img src="/img/walkingSmall.png?1" alt="Walking to the counter" title="Module 1: Walking to the counter" width="38" height="38" /></a>
                     </p>
                 </nav>
                 <?php } ?>
-                 	
-                <?php        
+
+                <?php
 						$main_content = getContent('main_content', $page);
 						$userLogin = $_SESSION['userID'];
 						if($page == '4___print'){
@@ -931,8 +931,8 @@ if($editID){
 								8 => $_REQUEST['survey8'],
 								9 => $_REQUEST['survey9'],
 								10 => $_REQUEST['survey10'],
-							);							
-							
+							);
+
 							if($survey[1] != ''){
 								survey($survey);
 							}
@@ -941,54 +941,54 @@ if($editID){
 							?>
                             <h1>Certificate of Completion</h1>
                             <p><strong><?php echo getInfo("fullname", $userLogin); ?></strong> has successfully completed training on identifying possible medical impairments during the license renewal process. The training is meant to help with the identification of drivers who may have vision, cognitive, or psychomotor impairments and refer them for additional evaluation.</p>
-                           
+
                             <p><img src="/img/check.png?4" alt="Check box"> Walking to the Counter<br />
-                            <img src="/img/check.png?4" alt="Check box"> Information Exchange<br /> 
-                            <img src="/img/check.png?4" alt="Check box"> Testing<br /> 
+                            <img src="/img/check.png?4" alt="Check box"> Information Exchange<br />
+                            <img src="/img/check.png?4" alt="Check box"> Testing<br />
                             <img src="/img/check.png?4" alt="Check box"> State Reporting</p>
                             <br />
                             <button id="printResults">Print</button>
-                        <?php 
+                        <?php
 							} else {
-								echo $noPageError;	
+								echo $noPageError;
 							}
-						} else if ($main_content != ''){							
+						} else if ($main_content != ''){
 							echo $main_content;
 							trackPage($page, false);
-							
+
 						} else {
-							echo $noPageError;							
-						} 
+							echo $noPageError;
+						}
                 ?>
                 </div>
                 <?php }	?>
              	<br class="clear" />
-         	</div><!-- /insideWrapper -->        
-  		</div><!-- /wrapper --> 
-    </div><!-- /outsideWrapper --> 
-          
-          
-          
+         	</div><!-- /insideWrapper -->
+  		</div><!-- /wrapper -->
+    </div><!-- /outsideWrapper -->
+
+
+
     <footer>
         <div id="copyright">
-        
+
             <div id="copyrightContainer">
                 <div role="footerContent" class="edit_footer" id="footer_content">
-                <?php        
+                <?php
                        echo getContent('footer_content', 'footer');
                 ?>
                 </div>
-                <br />                
+                <br />
                 <p>&copy; <?php echo date("Y"); ?>  Missouri Coalition for Roadway Safety<br />
                 P.O. Box 270, Jefferson City, MO 65102<br />
                 (800) 800-2358, (573) 751-4161<br /><br />
-                <?php 
+                <?php
                 if ($admin == true){
                     echo '<a href="'. $siteRoot .'logout">Admin Logout</a>';
                 } else {
                     echo '<a href="#loginForm" class="inline cboxElement" id="login">Admin</a>';
                 }
-                ?> 
+                ?>
                 </p>
             </div><!-- /copyrightContainer -->
          </div><!-- /copyright -->
@@ -1002,28 +1002,28 @@ if($editID){
                     <p><input type="submit" value="Submit"/></p>
                 </form>
              </div>
-             
-             
+
+
              <div id="registrationForm">
                 <h2>Register for Training</h2>
                 <form action="<?php echo $siteRoot ?>" method="post" name="registration_form" id="registration_form">
                     <p>You will log in with your name and email address, no password required.</p>
                     <p><label for="fullName"><strong>Full Name:</strong> </label><input type="text" name="fullName" id="fullName" placeholder="First &amp; Last Name" required /></p>
-                    <p><label for="use"><strong>Email:</strong> </label><input type="email" name="use" id="use" placeholder="email@example.com" required /></p>  
+                    <p><label for="use"><strong>Email:</strong> </label><input type="email" name="use" id="use" placeholder="email@example.com" required /></p>
                     <div id="phoneContact">
                     	<input type="hidden" value="<?php echo $contactID; ?>" name="registerID" />
                         <label for="registerPassword">Leave this field blank</label>
                         <input type="password" placeholder="Leave this blank" value="" name="registerPassword" /></div>
-                    
+
                     <p><input type="submit" value="Register" class="blueGradient gradient" /> </p>
                     <br />
                     <p><em>You should receive a confirmation email after you click &quot;Register&quot;. Click on the link in the email to complete registration.</em></p>
-                    
+
                     <br /><p>No confirmation email? Resend <a href="">confirmation email</a>.</p>
                 </form>
              </div>
          </div>
-         <br class="clear" /> 
+         <br class="clear" />
     </footer>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
@@ -1032,8 +1032,13 @@ if($editID){
 <script src="<?php echo $siteRoot ?>js/plugins.js"></script>
 <script src="<?php echo $siteRoot ?>js/script.js?<?php echo get_random_string()?>"></script>
 <?php if($admin == true && $page != "all_pics"){ echo '<script src="'. $siteRoot .'js/editable.js?'. get_random_string() .'" type="text/javascript"></script>';}; ?>
+
+<?php
+//My Version created July 2019
+?>
+
 <script type="text/javascript">
-/* Update _setAccount value to user's Google Analytic account and uncomment this script 
+/* Update _setAccount value to user's Google Analytic account and uncomment this script
  var _gaq = _gaq || [];
   _gaq.push(['_setAccount', '//////']);
   _gaq.push(['_trackPageview']);
